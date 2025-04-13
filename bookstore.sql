@@ -1,0 +1,308 @@
+-- 1. We're taking a practical approach based on real-world library operations. Our digital library system is designed to function as the backend for a book-selling 
+-- website, a recommendation platform, or the digital interface for a physical library's front desk.
+
+-- -- 2. CREATE DATABASE
+-- CREATE DATABASE bookstore;
+-- USE bookstore;
+
+-- -- 3. CREATE REFERENCE TABLES (INDEPENDENT TABLES FIRST)
+-- -- Country Table
+-- CREATE TABLE country (
+--     country_id INT AUTO_INCREMENT PRIMARY KEY,
+--     country_name VARCHAR(100) NOT NULL
+-- );
+
+-- -- Book Language Table
+-- CREATE TABLE book_language (
+--     language_id INT AUTO_INCREMENT PRIMARY KEY,
+--     language_name VARCHAR(50) NOT NULL
+-- );
+
+-- -- Publisher Table
+-- CREATE TABLE publisher (
+--     publisher_id INT AUTO_INCREMENT PRIMARY KEY,
+--     publisher_name VARCHAR(100) NOT NULL,
+--     publisher_email VARCHAR(100),
+--     publisher_phone VARCHAR(20)
+-- );
+
+-- -- Author Table
+-- CREATE TABLE author (
+--     author_id INT AUTO_INCREMENT PRIMARY KEY,
+--     author_first_name VARCHAR(50) NOT NULL,
+--     author_last_name VARCHAR(50) NOT NULL,
+--     author_email VARCHAR(100),
+--     author_bio TEXT
+-- );
+
+-- -- Address Status Table
+-- CREATE TABLE address_status (
+--     status_id INT AUTO_INCREMENT PRIMARY KEY,
+--     status_name VARCHAR(30) NOT NULL
+-- );
+
+-- -- Shipping Method Table
+-- CREATE TABLE shipping_method (
+--     method_id INT AUTO_INCREMENT PRIMARY KEY,
+--     method_name VARCHAR(50) NOT NULL,
+--     cost DECIMAL(6,2) NOT NULL
+-- );
+
+-- -- Order Status Table
+-- CREATE TABLE order_status (
+--     status_id INT AUTO_INCREMENT PRIMARY KEY,
+--     status_name VARCHAR(30) NOT NULL
+-- );
+
+-- -- 4. CREATE MAIN ENTITY TABLES
+-- -- Address Table
+-- CREATE TABLE address (
+--     address_id INT AUTO_INCREMENT PRIMARY KEY,
+--     street_number VARCHAR(20),
+--     street_name VARCHAR(100) NOT NULL,
+--     city VARCHAR(100) NOT NULL,
+--     state_province VARCHAR(100),
+--     postal_code VARCHAR(20) NOT NULL,
+--     country_id INT NOT NULL,
+--     FOREIGN KEY (country_id) REFERENCES country(country_id)
+-- );
+
+-- -- Customer Table
+-- CREATE TABLE customer (
+--     customer_id INT AUTO_INCREMENT PRIMARY KEY,
+--     first_name VARCHAR(50) NOT NULL,
+--     last_name VARCHAR(50) NOT NULL,
+--     email VARCHAR(100) NOT NULL UNIQUE,
+--     phone VARCHAR(20),
+--     registration_date DATETIME DEFAULT CURRENT_TIMESTAMP
+-- );
+
+-- -- Customer Address (Junction Table)
+-- CREATE TABLE customer_address (
+--     customer_id INT NOT NULL,
+--     address_id INT NOT NULL,
+--     status_id INT NOT NULL,
+--     PRIMARY KEY (customer_id, address_id),
+--     FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
+--     FOREIGN KEY (address_id) REFERENCES address(address_id),
+--     FOREIGN KEY (status_id) REFERENCES address_status(status_id)
+-- );
+
+-- -- Book Table
+-- CREATE TABLE book (
+--     book_id INT AUTO_INCREMENT PRIMARY KEY,
+--     title VARCHAR(255) NOT NULL,
+--     isbn VARCHAR(20) UNIQUE,
+--     publication_date DATE,
+--     price DECIMAL(6,2) NOT NULL,
+--     publisher_id INT,
+--     language_id INT,
+--     page_count INT,
+--     description TEXT,
+--     FOREIGN KEY (publisher_id) REFERENCES publisher(publisher_id),
+--     FOREIGN KEY (language_id) REFERENCES book_language(language_id)
+-- );
+
+-- -- Book Author (Junction Table)
+-- CREATE TABLE book_author (
+--     book_id INT NOT NULL,
+--     author_id INT NOT NULL,
+--     PRIMARY KEY (book_id, author_id),
+--     FOREIGN KEY (book_id) REFERENCES book(book_id),
+--     FOREIGN KEY (author_id) REFERENCES author(author_id)
+-- );
+
+-- -- Customer Order Table
+-- CREATE TABLE cust_order (
+--     order_id INT AUTO_INCREMENT PRIMARY KEY,
+--     customer_id INT NOT NULL,
+--     order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+--     shipping_method_id INT NOT NULL,
+--     destination_address_id INT NOT NULL,
+--     status_id INT NOT NULL,
+--     FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
+--     FOREIGN KEY (shipping_method_id) REFERENCES shipping_method(method_id),
+--     FOREIGN KEY (destination_address_id) REFERENCES address(address_id),
+--     FOREIGN KEY (status_id) REFERENCES order_status(status_id)
+-- );
+
+-- -- Order Line Table
+-- CREATE TABLE order_line (
+--     order_id INT NOT NULL,
+--     book_id INT NOT NULL,
+--     quantity INT NOT NULL,
+--     price DECIMAL(6,2) NOT NULL,
+--     PRIMARY KEY (order_id, book_id),
+--     FOREIGN KEY (order_id) REFERENCES cust_order(order_id),
+--     FOREIGN KEY (book_id) REFERENCES book(book_id)
+-- );
+
+-- -- Order History Table
+-- CREATE TABLE order_history (
+--     history_id INT AUTO_INCREMENT PRIMARY KEY,
+--     order_id INT NOT NULL,
+--     status_id INT NOT NULL,
+--     status_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+--     notes TEXT,
+--     FOREIGN KEY (order_id) REFERENCES cust_order(order_id),
+--     FOREIGN KEY (status_id) REFERENCES order_status(status_id)
+-- );
+
+-- 5. CREATE USER ROLES
+-- Admin Role: Jasper
+-- CREATE USER 'jasper'@'localhost' IDENTIFIED BY 'J@sp3r_S3cure!';
+-- GRANT ALL PRIVILEGES ON bookstore.* TO 'jasper'@'localhost';
+
+-- -- Sales Role: Tsholo
+-- CREATE USER 'tsholo'@'localhost' IDENTIFIED BY 'Tsh0l0_S@les2024';
+-- GRANT SELECT, INSERT, UPDATE ON bookstore.customer TO 'tsholo'@'localhost';
+-- GRANT SELECT, INSERT, UPDATE ON bookstore.cust_order TO 'tsholo'@'localhost';
+-- GRANT SELECT ON bookstore.book TO 'tsholo'@'localhost';
+-- FLUSH PRIVILEGES;
+
+-- -- 6. INSERT SAMPLE DATA
+-- -- Countries
+-- INSERT INTO country (country_name) VALUES
+-- ('United States'), ('Canada'), ('United Kingdom'), ('Australia');
+
+-- -- Book Languages
+-- INSERT INTO book_language (language_name) VALUES
+-- ('English'), ('Spanish'), ('French'), ('German');
+
+-- -- Publishers
+-- INSERT INTO publisher (publisher_name, publisher_email, publisher_phone) VALUES
+-- ('Penguin Random House', 'info@penguinrandomhouse.com', '212-555-1000'),
+-- ('HarperCollins', 'info@harpercollins.com', '212-555-2000'),
+-- ('Simon & Schuster', 'info@simonschuster.com', '212-555-3000');
+
+-- -- Authors
+-- INSERT INTO author (author_first_name, author_last_name, author_email, author_bio) VALUES
+-- ('Stephen', 'King', 'sking@example.com', 'Master of horror fiction'),
+-- ('J.K.', 'Rowling', 'jkrowling@example.com', 'Creator of Harry Potter'),
+-- ('James', 'Patterson', 'jpatterson@example.com', 'Bestselling thriller author');
+
+-- -- Address Statuses
+-- INSERT INTO address_status (status_name) VALUES
+-- ('Current'), ('Previous'), ('Shipping'), ('Billing');
+
+-- -- Shipping Methods
+-- INSERT INTO shipping_method (method_name, cost) VALUES
+-- ('Standard', 4.99), ('Express', 9.99), ('Overnight', 19.99);
+
+-- -- Order Statuses
+-- INSERT INTO order_status (status_name) VALUES
+-- ('Pending'), ('Processing'), ('Shipped'), ('Delivered'), ('Cancelled');
+
+-- -- Addresses
+-- INSERT INTO address (street_number, street_name, city, state_province, postal_code, country_id) VALUES
+-- ('123', 'Main St', 'New York', 'NY', '10001', 1),
+-- ('456', 'Maple Ave', 'Toronto', 'ON', 'M5V 2H1', 2),
+-- ('789', 'Oxford St', 'London', '', 'W1D 1BS', 3);
+
+-- -- Customers
+-- INSERT INTO customer (first_name, last_name, email, phone) VALUES
+-- ('John', 'Doe', 'john.doe@example.com', '555-123-4567'),
+-- ('Jane', 'Smith', 'jane.smith@example.com', '555-987-6543'),
+-- ('Bob', 'Johnson', 'bob.johnson@example.com', '555-456-7890');
+
+-- -- Customer Addresses
+-- INSERT INTO customer_address (customer_id, address_id, status_id) VALUES
+-- (1, 1, 1), (2, 2, 1), (3, 3, 1);
+
+-- -- Books
+-- INSERT INTO book (title, isbn, publication_date, price, publisher_id, language_id, page_count, description) VALUES
+-- ('The Shining', '9780307743657', '1977-01-28', 9.99, 1, 1, 447, 'Jack Torrance''s new job at the Overlook Hotel'),
+-- ('Harry Potter and the Philosopher''s Stone', '9780747532743', '1997-06-26', 12.99, 2, 1, 223, 'Harry Potter''s first year at Hogwarts'),
+-- ('Along Came a Spider', '9780446364195', '1993-02-01', 8.99, 3, 1, 502, 'Alex Cross thriller series debut');
+
+-- -- Book Authors
+-- INSERT INTO book_author (book_id, author_id) VALUES
+-- (1, 1), (2, 2), (3, 3);
+
+-- -- Orders
+-- INSERT INTO cust_order (customer_id, shipping_method_id, destination_address_id, status_id) VALUES
+-- (1, 1, 1, 3), (2, 2, 2, 2), (3, 3, 3, 1);
+
+-- -- Order Lines
+-- INSERT INTO order_line (order_id, book_id, quantity, price) VALUES
+-- (1, 1, 1, 9.99), (1, 2, 1, 12.99),
+-- (2, 2, 2, 12.99), (3, 3, 1, 8.99);
+
+-- -- Order History
+-- INSERT INTO order_history (order_id, status_id, notes) VALUES
+-- (1, 1, 'Order received'), (1, 3, 'Shipped via USPS'),
+-- (2, 1, 'Order received'), (3, 1, 'Order received');
+
+-- -- 7. CREATE INDEXES
+-- CREATE INDEX idx_book_title ON book(title);
+-- CREATE INDEX idx_customer_email ON customer(email);
+-- CREATE INDEX idx_order_date ON cust_order(order_date);
+
+-- -- 8. CREATE VIEWS
+-- CREATE VIEW book_details AS
+-- SELECT b.book_id, b.title, b.isbn, 
+--     GROUP_CONCAT(CONCAT(a.author_first_name, ' ', a.author_last_name)) AS authors
+-- FROM book b
+-- JOIN book_author ba ON b.book_id = ba.book_id
+-- JOIN author a ON ba.author_id = a.author_id
+-- GROUP BY b.book_id;
+
+-- Relational Data Integrity Checks
+ -- Verify Book-Author Relationships (Many-to-Many):
+
+-- Get all books with their authors
+-- SELECT b.title, CONCAT(a.author_first_name, ' ', a.author_last_name) AS author_name
+-- FROM book b
+-- JOIN book_author ba ON b.book_id = ba.book_id
+-- JOIN author a ON ba.author_id = a.author_id
+-- ORDER BY b.title;
+
+-- Verify Customer-Order Relationships (One-to-Many):
+
+-- Get all orders with customer details
+-- SELECT o.order_id, CONCAT(c.first_name, ' ', c.last_name) AS customer_name, o.order_date
+-- FROM cust_order o
+-- JOIN customer c ON o.customer_id = c.customer_id;
+
+-- Verify Order-Book Relationships (Many-to-Many via order_line):
+-- Get order details with books purchased
+-- SELECT o.order_id, b.title, ol.quantity, ol.price
+-- FROM cust_order o
+-- JOIN order_line ol ON o.order_id = ol.order_id
+-- JOIN book b ON ol.book_id = b.book_id;
+
+-- Security & Permissions Test
+-- Check Jasper’s Privileges:
+
+-- Log in as Jasper and run:
+-- SHOW GRANTS FOR 'jasper'@'localhost';
+
+-- Customer Looking for a Book:
+
+-- Search for a book by title
+-- SELECT title, isbn, price 
+-- FROM book 
+-- WHERE title LIKE '%Harry Potter%';
+
+-- Search for books by author
+-- SELECT b.title, CONCAT(a.author_first_name, ' ', a.author_last_name) AS author
+-- FROM book b
+-- JOIN book_author ba ON b.book_id = ba.book_id
+-- JOIN author a ON ba.author_id = a.author_id
+-- WHERE a.author_last_name = 'King';
+
+-- Customer Checking Order History:
+
+-- Get order history for customer John Doe
+-- SELECT o.order_id, o.order_date, os.status_name, sm.method_name AS shipping_method
+-- FROM cust_order o
+-- JOIN order_status os ON o.status_id = os.status_id
+-- JOIN shipping_method sm ON o.shipping_method_id = sm.method_id
+-- WHERE o.customer_id = 1; -- Replace with actual customer_id
+
+-- -- Updating Customer Address:
+
+-- -- Update a customer's address (sales role test)
+-- UPDATE address
+-- SET street_name = 'New Street Name'
+-- WHERE address_id = 1;
