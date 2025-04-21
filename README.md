@@ -288,6 +288,7 @@ JOIN shipping_method sm ON o.shipping_method_id = sm.method_id
 WHERE o.customer_id = 1; -- Replace with actual customer_id
 
 ### 11. Updating Customer Address (Sales Role Test)
+
 ```sql
 UPDATE address
 SET street_name = 'New Street Name'
