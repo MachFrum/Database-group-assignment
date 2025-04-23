@@ -286,8 +286,9 @@ FROM cust_order o
 JOIN order_status os ON o.status_id = os.status_id
 JOIN shipping_method sm ON o.shipping_method_id = sm.method_id
 WHERE o.customer_id = 1; -- Replace with actual customer_id
+```
 
-### 11. Customer Operations
+### 11. Customer Addres
 
 #### Updating Customer Address (Sales Role Test)
 ```sql
