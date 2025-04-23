@@ -207,7 +207,7 @@ CREATE USER 'tsholo'@'localhost' IDENTIFIED BY 'Tsh0l0_S@les2024';
 GRANT SELECT, INSERT, UPDATE ON bookstore.customer TO 'tsholo'@'localhost';
 GRANT SELECT, INSERT, UPDATE ON bookstore.cust_order TO 'tsholo'@'localhost';
 GRANT SELECT ON bookstore.book TO 'tsholo'@'localhost';
-FLUSH PRIVILEGES;
+FLUSH PRIVILEGES;  -- This is in the case of older versions of My SQL. Just in case.
 ```
 
 ### 5. Insert Sample Data
